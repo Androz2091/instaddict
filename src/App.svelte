@@ -6,7 +6,7 @@
 	<div class="app-header">
 		<div class="app-header-container">
 			<div class="app-header-icon tag"><a href="/">#</a></div>
-			<h1>instaRecovery</h1>
+			<h1>Instagram Addict</h1>
 		</div>
 	</div>
 	{#if !loaded}
