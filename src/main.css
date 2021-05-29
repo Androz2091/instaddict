@@ -1,7 +1,26 @@
 @import url('https://fonts.googleapis.com/css?family=Fira+Sans:200,400,600,800|Source+Sans+Pro:400,700&display=swap');
 
+html {
+    height: 100%;
+}
+
 body {
+    min-height: 100vh;
+    padding: 0;
     font-family: 'Fira Sans', sans-serif;
+}
+
+footer {
+    grid-row-start: 2;
+    grid-row-end: 3;
+    background-color: rgba(var(--main-color-r), var(--main-color-g), var(--main-color-b), .3);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+footer p {
+    margin: 0;
+    margin-left: 1rem;
 }
 
 :root {
