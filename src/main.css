@@ -24,3 +24,9 @@ body {
     border: 0.1rem solid white;
     transform: rotate(-4deg);
 }
+
+a {
+    color: var(--main-color);
+    font-weight: bolder;
+    text-decoration: none;
+}

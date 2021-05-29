@@ -12,6 +12,7 @@
 	{#if !loaded}
 		<div class="app-loader">
 			<div class="app-loader-boxes">
+				<p class="app-loader-description">Ne vous êtes-vous jamais demandé... combien de messages Instagram avez-vous écrit dans votre vie ? Combien de posts avez-vous vu ? Quels sont les comptes que vous likez le plus ?<br><br><a href="https://instaddict.me">Instaddict.me</a> est un site qui fait le travail pour vous, en se chargeant d'analyser vos données RGPD. C'est votre appareil qui traite les données, rien n'est envoyé sur aucun serveur !</p>
 				<p>
 					<a class="app-loader-tuto" href="https://www.instagram.com/download/request/" target="_blank">
 						<small class="app-loader-tag tag">1</small>
@@ -65,12 +66,15 @@
 		}
 	}
 	.app-loader {
-		padding-top: 7.25rem;
+		padding-top: 5.5rem;
 		max-width: 768px;
 		margin: auto;
 	}
 	.app-loader-boxes {
 		padding: 0 30px;
+	}
+	.app-loader-description {
+		margin: 3rem auto;
 	}
 	.app-loader-tuto {
 		position: relative;
@@ -115,5 +119,9 @@
 		top: -10px;
 		left: -10px;
 		color: white;
+	}
+	.app-loader-faq {
+		margin-top: 3rem;
+		text-align: center;
 	}
 </style>
