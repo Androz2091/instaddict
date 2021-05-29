@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:200,400,600,800|Source+Sans+Pro:400,700&display=swap');
+
+body {
+    font-family: 'Fira Sans', sans-serif;
+}
+
+:root {
+    --main-color: #a600af;
+    --main-color-r: 166;
+    --main-color-g: 0;
+    --main-color-b: 175;
+}
+
+.tag {
+    text-align: center;
+    background-color: var(--main-color);
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    margin-right: 0.6rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: 0.3rem;
+    border: 0.1rem solid white;
+    transform: rotate(-4deg);
+}
