@@ -86,7 +86,7 @@
 
 <style lang="scss">
     .app-loader {
-		padding-top: 5rem;
+		padding-top: 3rem;
 		max-width: 768px;
 		margin: auto;
 	}
@@ -94,6 +94,7 @@
 		padding: 0 30px;
 	}
 	.app-loader-description {
+        font-weight: 500;
 		margin: 3rem auto;
 	}
 	.app-loader-tuto {
@@ -131,4 +132,11 @@
 		left: -10px;
 		color: white;
 	}
+    @media (min-width: 1080px) {
+        .app-loader-description {
+            margin: auto;
+            margin-top: 5rem;
+            margin-bottom: 3rem;
+        }
+    }
 </style>

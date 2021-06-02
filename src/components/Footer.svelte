@@ -11,6 +11,7 @@
         background-color: var(--third-background-color);
         padding-top: 1rem;
         padding-bottom: 1rem;
+        margin-top: 2rem;
     }
 
     footer p {
