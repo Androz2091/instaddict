@@ -131,4 +131,17 @@
 		left: -10px;
 		color: white;
 	}
+    .tag {
+        text-align: center;
+        background-color: var(--main-color);
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        margin-right: 0.6rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        border-radius: 0.3rem;
+        border: 0.1rem solid var(--accent-background-color);
+        transform: rotate(-4deg);
+    }
 </style>

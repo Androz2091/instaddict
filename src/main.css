@@ -25,33 +25,6 @@ body {
     font-weight: 400;
 }
 
-footer {
-    grid-row-start: 2;
-    grid-row-end: 3;
-    background-color: var(--third-background-color);
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-footer p {
-    margin: 0;
-    margin-left: 1rem;
-}
-
-.tag {
-    text-align: center;
-    background-color: var(--main-color);
-    width: 2rem;
-    height: 2rem;
-    line-height: 2rem;
-    margin-right: 0.6rem;
-    font-size: 1.3rem;
-    font-weight: 600;
-    border-radius: 0.3rem;
-    border: 0.1rem solid var(--accent-background-color);
-    transform: rotate(-4deg);
-}
-
 a {
     color: var(--secondary-color) !important;
     font-weight: bolder;
