@@ -111,6 +111,8 @@ export async function extractData (files) {
         word: decodeURIComponent(escape(w.word))
     }));
     
-    console.log(extractedData.favoriteWords)
+    console.log(extractedData.favoriteWords);
+
+    return extractedData;
 
 };

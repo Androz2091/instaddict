@@ -1,7 +1,11 @@
 <template>
-    <h3>Coucou</h3>
+    <div class="app-stats">
+
+    </div>
 </template>
 
 <style>
-
+    .app-stats {
+        display: grid;
+    }
 </style>
