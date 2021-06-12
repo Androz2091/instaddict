@@ -44,6 +44,7 @@ export async function extractData (files) {
                 .map((f) => f.name.match(messageRegex)[1]);
 
             const chatData = {
+                name: null,
                 isGroup: null,
                 messageCount: null,
                 messages: []
@@ -61,6 +62,7 @@ export async function extractData (files) {
 
                         chatData.isGroup = content.participants.length > 2;
                         chatData.messageCount += content.messages.length;
+                        chatData.name = decodeURIComponent(escape(content.title));
 
                         content.messages
                             .filter((m) => m.sender_name === username && m.content)
@@ -105,13 +107,14 @@ export async function extractData (files) {
 
     }));
 
-    const words = extractedData.chats.map((chat) => chat.messages).flat().map((message) => message.content.split(' ')).flat().filter((w) => w.length > 5);
+    const messages = extractedData.chats.map((chat) => chat.messages).flat();
+    extractedData.totalMessageCount = messages.length;
+
+    const words = messages.map((message) => message.content.split(' ')).flat().filter((w) => w.length > 5);
     extractedData.favoriteWords = getFavoriteWords(words).map((w) => ({
         count: w.count,
         word: decodeURIComponent(escape(w.word))
     }));
-    
-    console.log(extractedData.favoriteWords);
 
     return extractedData;
 
