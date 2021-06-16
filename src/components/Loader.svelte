@@ -56,7 +56,7 @@
 <template>
     <div class="app-loader">
         <div class="app-loader-boxes">
-            <p class="app-loader-description">Have you ever wondered... how many Instagram posts you've written in your life? How many posts you've liked? How many minutes of voicemails you've sent?<br><br><a href="https://instaddict.me">Instaddict.me</a> is a site that does the work for you, analyzing your RGPD data. It is your device that processes the data, nothing is sent to any server!</p>
+            <p class="app-loader-description">Have you ever wondered... how many Instagram posts you've written in your life? How many posts you've liked? How many minutes of voice messages you've sent?<br><br><a href="https://instaddict.me">Instaddict.me</a> is a site that does the work for you, analyzing your RGPD data. It is your device that processes the data, nothing is sent to any server!</p>
             <p>
                 <a class="app-loader-tuto" href="https://www.instagram.com/download/request/" target="_blank">
                     <small class="app-loader-tag tag">1</small>
