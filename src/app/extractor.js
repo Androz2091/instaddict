@@ -25,8 +25,10 @@ export async function extractData (files) {
     const extractedData = {
 
         mostUsedWords: [],
-        totalMessageCount: [],
-        chats: []
+        chats: [],
+        totalMessageCount: 0,
+
+        username: null
 
     };
 
@@ -106,6 +108,8 @@ export async function extractData (files) {
         });
 
     }));
+
+    extractedData.username = username;
 
     const messages = extractedData.chats.map((chat) => chat.messages).flat();
     extractedData.totalMessageCount = messages.length;
