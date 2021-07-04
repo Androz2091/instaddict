@@ -42,7 +42,8 @@
             ];
             for (const requiredFile of requiredFiles) {
                 if (! files.some((file) => file.name === requiredFile)) {
-                    return false;
+                    // TODO: add validation
+                    // return false;
                 }
             }
             return true;
