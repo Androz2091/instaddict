@@ -5,6 +5,22 @@ export async function extractData (files) {
 
     const getFile = (name) => files.find((file) => file.name === name);
 
+    const getVideoDuration = (file) => {
+        return new Promise((resolve) => {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+        
+            video.onloadedmetadata = function() {
+        
+                window.URL.revokeObjectURL(video.src);
+                resolve(video.duration);
+            }
+        
+            video.src = URL.createObjectURL(file);
+        });
+    }
+    
+
     const readFile = (name) => {
         return new Promise((resolve) => {
             const file = getFile(name);
@@ -22,17 +38,39 @@ export async function extractData (files) {
         });
     };
 
+    const readVideoFile = (name) => {
+        return new Promise((resolve) => {
+            const file = getFile(name);
+            if (!file) return resolve(null);
+            const fileContents = [];
+            file.ondata = (err, data, final) => {
+                fileContents.push(data);
+                if (final) resolve(new Blob(fileContents));
+            };
+            file.start();
+        });
+    }
+
     const extractedData = {
 
         mostUsedWords: [],
         chats: [],
+
+        totalUsers: 0,
         totalMessageCount: 0,
+        totalVoiceMessagesMinutes: 0,
+
+        totalMessageCountReceived: 0,
+        totalVoiceMessagesMinutesReceived: 0,
 
         username: null
 
     };
 
+    const users = new Set();
     let username;
+    let totalVoiceMessagesSeconds = 0;
+    let totalVoiceMessagesSecondsReceived = 0;
 
     const chatRegex = /^messages\/inbox\/([0-9a-z_]+)\/message_1\.json$/;
     const chats = files.filter((f) => chatRegex.test(f.name)).map((f) => f.name.match(chatRegex)[1]);
@@ -67,28 +105,39 @@ export async function extractData (files) {
                         chatData.name = decodeURIComponent(escape(content.title));
 
                         content.messages
-                            .filter((m) => m.sender_name === username && m.content)
+                            .filter((m) => m.content)
                             .forEach((message) => {
 
-                                if (!message.content) console.log(message)
+                                users.add(message.sender_name);
 
-                                chatData.messages.push({
-                                    content: message.content,
-                                    timestamp: message.timestamp
-                                });
-
+                                if (message.sender_name === username) {
+                                    chatData.messages.push({
+                                        content: message.content,
+                                        timestamp: message.timestamp
+                                    });
+                                } else {
+                                    extractedData.totalMessageCountReceived++;
+                                }
                         });
 
                         Promise.all(
                             content.messages
-                                .filter((m) => m.sender_name === username && m.audio_files)
+                                .filter((m) => m.audio_files && m.audio_files[0].uri.startsWith('messages'))
                                 .map((voiceMessage) => {
 
                                     return new Promise((resolveAudioMessagePromise) => {
 
-                                        // todo read audio file
+                                        readVideoFile(voiceMessage.audio_files[0].uri).then((file) => {
 
-                                        resolveAudioMessagePromise();
+                                            getVideoDuration(file).then((duration) => {
+
+                                                if (voiceMessage.sender_name === username) totalVoiceMessagesSeconds += duration;
+                                                else totalVoiceMessagesSecondsReceived += duration;
+                                                resolveAudioMessagePromise();
+
+                                            });
+                                                                                
+                                        });
 
                                     });
 
@@ -110,6 +159,9 @@ export async function extractData (files) {
     }));
 
     extractedData.username = username;
+    extractedData.totalUsers = users.size;
+    extractedData.totalVoiceMessagesMinutes = Math.ceil(totalVoiceMessagesSeconds / 60);
+    extractedData.totalVoiceMessagesMinutesReceived = Math.ceil(totalVoiceMessagesSecondsReceived / 60);
 
     const messages = extractedData.chats.map((chat) => chat.messages).flat();
     extractedData.totalMessageCount = messages.length;

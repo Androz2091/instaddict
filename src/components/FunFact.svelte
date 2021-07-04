@@ -6,16 +6,17 @@
     export let count = null;
     export let content = null;
     export let explanation = null;
+    export let thirdColor = false;
 
     const htmlContent = content ?
-        content.includes('%') ? content.split('%')[0] + '<span class="text-discord">' + (!isNaN(count) ? count.toLocaleString('en-US') : 'N/A') + '</span>' + content.split('%')[1] : content
+        content.includes('%') ? content.split('%')[0] + '<span class="text-discord" class="'+(thirdColor && 'third-count')+'">' + (!isNaN(count) ? count.toLocaleString('en-US') : 'N/A') + '</span>' + content.split('%')[1] : content
         : null;
 </script>
 
 <div>
     <div class="fun-fact">
         <slot name="svg">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap={strokeLinecap} stroke-linejoin={strokeLinejoin} stroke-width={strokeWidth} d="{ svg }"></path></svg>
+            <svg class="{thirdColor ? 'third-svg' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap={strokeLinecap} stroke-linejoin={strokeLinejoin} stroke-width={strokeWidth} d="{ svg }"></path></svg>
         </slot>
         <slot name="content">
             <h3 style="margin-left: 10px;">{ @html htmlContent }</h3>

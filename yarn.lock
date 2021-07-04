@@ -883,6 +883,11 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
+mp4box@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.npmjs.org/mp4box/-/mp4box-0.4.1.tgz#7dc6369142b01d9233480454eb08ce1ce3e1d9b8"
+  integrity sha512-SkGIvunxxWePxq7gFGjpn7kvL0PKsahu1k6NKkUtFFtoFPaXMnYVgXLnJv7Ec1QWkem5rpFxQwNab9iErOTMYw==
+
 mri@^1.1.0:
   version "1.1.6"
   resolved "https://registry.npmjs.org/mri/-/mri-1.1.6.tgz"

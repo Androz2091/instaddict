@@ -1,17 +1,13 @@
 <script>
-    let defaultAvatar = '/default-avatar.png';
-
     export let name;
-    export let discriminator;
-    export let avatar;
 </script>
 
 <div class="user-profile">
     <div class="avatar">
-        <img src="{ avatar }" alt="Avatar" />
+        <img src="/avatar.png" alt="Avatar" />
     </div>
     <h1>
-        { name }<small class="text-muted">#{ discriminator }</small>
+        { name }
     </h1>
 </div>
 
