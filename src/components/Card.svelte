@@ -1,12 +1,20 @@
 <script>
     export let name;
+    export let title;
 </script>
 
 <div class="card {name}">
+    <h2>{title}</h2>
     <slot></slot>
 </div>
 
 <style>
+
+    h2 {
+        font-weight: 600;
+        color: #FCAF45;
+    }
+
     .card {
         background-color: #202225;
         border-radius: 10px;
@@ -20,7 +28,11 @@
             grid-column: 8 / 12;
         }
         .card.third {
-            grid-column: 1 / 6;
+            grid-column: 1 / 4;
+            grid-row: 2 / 3;
+        }
+        .card.fourth {
+            grid-column: 4 / 7;
             grid-row: 2 / 3;
         }
         .card.top-users {

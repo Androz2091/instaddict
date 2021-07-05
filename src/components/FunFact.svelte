@@ -9,13 +9,13 @@
     export let thirdColor = false;
 
     const htmlContent = content ?
-        content.includes('%') ? content.split('%')[0] + '<span class="text-discord" class="'+(thirdColor && 'third-count')+'">' + (!isNaN(count) ? count.toLocaleString('en-US') : 'N/A') + '</span>' + content.split('%')[1] : content
+        content.includes('%') ? content.split('%')[0] + '<span class="text-discord" class="'+(thirdColor && 'third-count')+'">' + (count !== null ? count.toLocaleString('en-US') : 'N/A') + '</span>' + content.split('%')[1] : content
         : null;
 </script>
 
 <div>
     <div class="fun-fact">
-        <slot name="svg">
+        <slot name="icon">
             <svg class="{thirdColor ? 'third-svg' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap={strokeLinecap} stroke-linejoin={strokeLinejoin} stroke-width={strokeWidth} d="{ svg }"></path></svg>
         </slot>
         <slot name="content">
@@ -32,23 +32,8 @@
 </div>
 
 <style>
-    svg {
-        --icon-dimensions: 2.5rem;
-
-        min-height: var(--icon-dimensions);
-        max-height: var(--icon-dimensions);
-        min-width: var(--icon-dimensions);
-        max-width: var(--icon-dimensions);
-    }
-
     .fun-fact {
         display: flex;
         align-items: center;
-    }
-
-    @media (max-width: 800px) {
-        svg {
-            --icon-dimensions: 2rem;
-        }
     }
 </style>

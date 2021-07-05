@@ -1,12 +1,13 @@
 <script>
     export let name;
+    export let profilePicture;
 </script>
 
 <div class="user-profile">
     <div class="avatar">
-        <img src="/avatar.png" alt="Avatar" />
+        <img src="{profilePicture ? `data:image/jpg;base64,${profilePicture}` : '/avatar.png'}" alt="Avatar" />
     </div>
-    <h1>
+    <h1 class="username">
         { name }
     </h1>
 </div>
@@ -14,6 +15,10 @@
 <style>
     h1 {
         font-size: 2rem;
+    }
+
+    .username {
+        text-align: center;
     }
 
     .user-profile {

@@ -1,5 +1,6 @@
 import { DecodeUTF8 } from 'fflate';
-import { getFavoriteWords } from './helpers';
+import { formatBytes, getFavoriteWords } from './helpers';
+import { loadTask } from './store';
 
 export async function extractData (files) {
 
@@ -38,7 +39,7 @@ export async function extractData (files) {
         });
     };
 
-    const readVideoFile = (name) => {
+    const readBlobFile = (name) => {
         return new Promise((resolve) => {
             const file = getFile(name);
             if (!file) return resolve(null);
@@ -51,29 +52,65 @@ export async function extractData (files) {
         });
     }
 
+    const readImageFile = (name) => {
+        return new Promise((resolve) => {
+            const file = getFile(name);
+            if (!file) return resolve(null);
+            const fileContents = [];
+            file.ondata = (err, data, final) => {
+                fileContents.push(data);
+                if (final) {
+                    const binstr = Array.prototype.map.call(fileContents[0], function (ch) {
+                        return String.fromCharCode(ch);
+                    }).join('');
+                    resolve(btoa(binstr));
+                }
+            };
+            file.start();
+        });
+    }
+
     const extractedData = {
 
         mostUsedWords: [],
-        chats: [],
 
-        totalUsers: 0,
+        totalUserCount: 0,
         totalMessageCount: 0,
         totalVoiceMessagesMinutes: 0,
+        totalLikedMessageCount: 0,
+        totalPhotoCountSent: 0,
+        totalStoryCountSent: 0,
 
+        totalPhotoCountReceived: 0,
         totalMessageCountReceived: 0,
         totalVoiceMessagesMinutesReceived: 0,
 
+        totalPollAnsweredCount: 0,
+        totalChangePasswordCount: 0,
+        totalLoginCount: 0,
+        totalLogoutCount: 0,
+
+        totalPhotoSize: 0,
+        totalVoiceMessagesSize: 0,
+        totalStorySize: 0,
+
+        profilePicture: null,
         username: null
 
     };
 
     const users = new Set();
+    const chatsData = [];
     let username;
     let totalVoiceMessagesSeconds = 0;
     let totalVoiceMessagesSecondsReceived = 0;
+    let totalPhotoSize = 0;
+    let totalVoiceMessagesSize = 0;
 
     const chatRegex = /^messages\/inbox\/([0-9a-z_]+)\/message_1\.json$/;
     const chats = files.filter((f) => chatRegex.test(f.name)).map((f) => f.name.match(chatRegex)[1]);
+
+    loadTask.set('Loading user messages...');
     
     await Promise.all(chats.map((chat) => {
         return new Promise((resolveChatPromise) => {
@@ -104,47 +141,69 @@ export async function extractData (files) {
                         chatData.messageCount += content.messages.length;
                         chatData.name = decodeURIComponent(escape(content.title));
 
-                        content.messages
-                            .filter((m) => m.content)
-                            .forEach((message) => {
-
-                                users.add(message.sender_name);
-
-                                if (message.sender_name === username) {
-                                    chatData.messages.push({
-                                        content: message.content,
-                                        timestamp: message.timestamp
-                                    });
-                                } else {
-                                    extractedData.totalMessageCountReceived++;
-                                }
-                        });
-
                         Promise.all(
                             content.messages
-                                .filter((m) => m.audio_files && m.audio_files[0].uri.startsWith('messages'))
-                                .map((voiceMessage) => {
+                                .map((message) => {
 
-                                    return new Promise((resolveAudioMessagePromise) => {
+                                    return new Promise((resolveMessagePromise) => {
 
-                                        readVideoFile(voiceMessage.audio_files[0].uri).then((file) => {
+                                        users.add(message.sender_name);
 
-                                            getVideoDuration(file).then((duration) => {
+                                        if (message.reactions?.some((react) => react.actor === username)) extractedData.totalLikedMessageCount++;
 
-                                                if (voiceMessage.sender_name === username) totalVoiceMessagesSeconds += duration;
-                                                else totalVoiceMessagesSecondsReceived += duration;
-                                                resolveAudioMessagePromise();
-
+                                        if (message.sender_name === username) {
+                                            chatData.messages.push({
+                                                content: message.content,
+                                                timestamp: message.timestamp
                                             });
-                                                                                
-                                        });
+                                        } else {
+                                            extractedData.totalMessageCountReceived++;
+                                        }
+
+                                        if (message.audio_files && message.audio_files[0].uri.startsWith('messages')) {
+
+                                            readBlobFile(message.audio_files[0].uri).then((file) => {
+
+                                                getVideoDuration(file).then((duration) => {
+    
+                                                    if (message.sender_name === username) {
+                                                        totalVoiceMessagesSize += file.size;
+                                                        totalVoiceMessagesSeconds += duration;
+                                                    }
+                                                    else totalVoiceMessagesSecondsReceived += duration;
+                                                    resolveMessagePromise();
+    
+                                                });
+                                                                                    
+                                            });
+
+                                        }
+
+                                        else if (message.photos) {
+
+                                            if (message.sender_name === username) {
+                                                console.log(message)
+                                                extractedData.totalPhotoCountSent++;
+                                            }
+                                            else {
+                                                extractedData.totalPhotoCountReceived++;
+                                                resolveMessagePromise();
+                                            }
+
+                                            readBlobFile(message.photos[0].uri).then((file) => {
+
+                                                totalPhotoSize += file.size;
+
+                                                resolveMessagePromise();
+                                            });
+                                        } else resolveMessagePromise();
 
                                     });
-
                             })
                         ).then(() => {
 
-                            extractedData.chats.push(chatData);
+                            chatsData.push(chatData);
+                            loadTask.set(`Loading messages... ${Math.ceil(chatsData.length / chats.length * 100)}%`);
 
                             resolveMessagesPromise();
                         });
@@ -158,19 +217,70 @@ export async function extractData (files) {
 
     }));
 
+    loadTask.set('Calculating messages statistics...');
+
     extractedData.username = username;
-    extractedData.totalUsers = users.size;
+    extractedData.totalUserCount = users.size;
     extractedData.totalVoiceMessagesMinutes = Math.ceil(totalVoiceMessagesSeconds / 60);
     extractedData.totalVoiceMessagesMinutesReceived = Math.ceil(totalVoiceMessagesSecondsReceived / 60);
 
-    const messages = extractedData.chats.map((chat) => chat.messages).flat();
+    const messages = chatsData.map((chat) => chat.messages).flat();
     extractedData.totalMessageCount = messages.length;
 
-    const words = messages.map((message) => message.content.split(' ')).flat().filter((w) => w.length > 5);
+    const words = messages.filter((message) => message.content).map((message) => message.content.split(' ')).flat().filter((w) => w.length > 5);
     extractedData.favoriteWords = getFavoriteWords(words).map((w) => ({
         count: w.count,
         word: decodeURIComponent(escape(w.word))
     }));
+
+    extractedData.totalPhotoSize = formatBytes(totalPhotoSize);
+    extractedData.totalVoiceMessagesSize = formatBytes(totalVoiceMessagesSize);
+
+    loadTask.set('Loading polls activities...');
+
+    const polls = JSON.parse(await readFile('story_sticker_interactions/polls.json'));
+    extractedData.totalPollAnsweredCount = polls.story_activities_polls?.length || 0;
+
+    loadTask.set('Loading security analytics...');
+
+    const passwordChangeActivity = JSON.parse(await readFile('login_and_account_creation/password_change_activity.json'));
+    extractedData.totalPasswordChangeCount = passwordChangeActivity.account_history_password_change_history?.length || 0;
+
+    const loginActivity = JSON.parse(await readFile('login_and_account_creation/login_activity.json'));
+    extractedData.totalLoginCount = loginActivity.account_history_login_history?.length || 0;
+
+    const logoutActivity = JSON.parse(await readFile('login_and_account_creation/logout_activity.json'));
+    extractedData.totalLogoutCount = logoutActivity.account_history_logout_history?.length || 0;
+
+    loadTask.set('Loading profile picture...');
+
+    const profilePicture = JSON.parse(await readFile('content/profile_photos.json'));
+    if (profilePicture) {
+        const picture = await readImageFile(profilePicture.ig_profile_picture[0].uri);
+        extractedData.profilePicture = picture;
+    }
+
+    loadTask.set('Loading stories...');
+
+    const storyImageRegex = /^media\/stories\/[0-9]+\/([a-z0-9_.]+)$/;
+    const storyImages = files.filter((f) => storyImageRegex.test(f.name)).map((f) => f.name);
+    let totalStorySize = 0;
+    await Promise.all(
+        storyImages.map((storyImage) => {
+            return new Promise((resolve) => {
+                readBlobFile(storyImage).then((file) => {
+                    totalStorySize += file.size;
+                    resolve();
+                });
+            });
+        })
+    );
+    extractedData.totalStorySize = formatBytes(totalStorySize);
+
+    const stories = JSON.parse(await readFile('content/stories.json'));
+    if (stories) {
+        extractedData.totalStoryCountSent = stories.ig_stories.length;
+    }
 
     return extractedData;
 
