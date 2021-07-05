@@ -97,40 +97,6 @@
                         <svg slot="icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </FunFact>
                 </Card>
-                <Card name="third" title="Ecology">
-                    <FunFact
-                        svg="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        content="You sent % of photos"
-                        count="{ $data.totalPhotoSize }"
-                    />
-                    <FunFact
-                        svg="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-                        content="You sent % of voice messages"
-                        count="{ $data.totalVoiceMessagesSize }"
-                    />
-                    <FunFact
-                        svg="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
-                        content="You posted % of stories/posts"
-                        count="{ $data.totalMediaSize }"
-                    />
-                </Card>
-                <Card name="fourth" title="Security">
-                    <FunFact
-                        svg="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                        content="% password changes"
-                        count="{ $data.totalPasswordChangeCount }"
-                    />
-                    <FunFact
-                        svg="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                        content="% logins"
-                        count="{ $data.totalLoginCount }"
-                    />
-                    <FunFact
-                        svg="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        content="% logouts"
-                        count="{ $data.totalLogoutCount }"
-                    />
-                </Card>
                 <Card name="hours" title="Your Instagram Hours">
                     <p>{ hoursLabels[$data.hoursValues.indexOf(Math.max(...$data.hoursValues))] } is definitely your favorite hour to chat with your friends!</p>
                     <Chart data={{
@@ -185,6 +151,61 @@
                     lineOptions="{{
                         dotSize: 4
                     }}" type="line" />
+                </Card>
+                <Card name="followers" title="Your Instagram Followers">
+                    <p>{ $data.followersValues[$data.followersValues.length-1] } users are currently following you!</p>
+                    <Chart data={{
+                        labels: $data.followersLabels,
+                        datasets: [
+                            {
+                                name: 'followers',
+                                values: $data.followersValues
+                            }
+                        ]
+                    }} axisOptions="{{
+                        xAxisMode: 'tick',
+                        xIsSeries: true
+                    }}"
+                    lineOptions="{{
+                        dotSize: 4,
+                        hideDots: true,
+                        spline: true
+                    }}" type="line" />
+                </Card>
+
+                <Card name="ecology" title="Ecology">
+                    <FunFact
+                        svg="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                        content="You sent % of photos"
+                        count="{ $data.totalPhotoSize }"
+                    />
+                    <FunFact
+                        svg="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                        content="You sent % of voice messages"
+                        count="{ $data.totalVoiceMessagesSize }"
+                    />
+                    <FunFact
+                        svg="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
+                        content="You posted % of stories/posts"
+                        count="{ $data.totalMediaSize }"
+                    />
+                </Card>
+                <Card name="security" title="Security">
+                    <FunFact
+                        svg="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                        content="% password changes"
+                        count="{ $data.totalPasswordChangeCount }"
+                    />
+                    <FunFact
+                        svg="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                        content="% logins"
+                        count="{ $data.totalLoginCount }"
+                    />
+                    <FunFact
+                        svg="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        content="% logouts"
+                        count="{ $data.totalLogoutCount }"
+                    />
                 </Card>
             </div>
         {/if}

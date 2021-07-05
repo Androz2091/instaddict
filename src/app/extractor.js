@@ -97,6 +97,8 @@ export async function extractData (files) {
         hoursValues: [],
         messagesMonths: [],
         topGroups: [],
+        followersLabels: [],
+        followersValues: [],
 
         profilePicture: null,
         username: null
@@ -302,10 +304,10 @@ export async function extractData (files) {
 
     const monthsLabels = [];
     const monthsValues = [];
-    const formatDate = (date) => `${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    const formatMonthDate = (date) => `${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     for (let i = new Date(firstMessage); i.getTime() <= Date.now(); i.setMonth(i.getMonth() + 1)) {
-        monthsLabels.push(formatDate(i));
-        monthsValues.push(allMessages.filter((m) => formatDate(new Date(m.timestamp)) === formatDate(i)).length);
+        monthsLabels.push(formatMonthDate(i));
+        monthsValues.push(allMessages.filter((m) => formatMonthDate(new Date(m.timestamp)) === formatMonthDate(i)).length);
     }
 
     extractedData.messagesMonths = {
@@ -324,6 +326,18 @@ export async function extractData (files) {
         name: group.name,
         sentMessageCount: group.sentMessageCount
     }));
+
+    const followers = JSON.parse(await readFile('followers_and_following/followers.json'));
+    const allFollowers = followers.relationships_followers.map((f) => f.string_list_data[0]);
+    const formatDayDate = (date) => `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    let followerCount = 0;
+    extractedData.followersValues = [];
+    for (let i = new Date(firstMessage); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
+        const followerDayCount = allFollowers.filter((m) => formatDayDate(new Date(m.timestamp * 1000)) === formatDayDate(i)).length;
+        extractedData.followersLabels.push(formatDayDate(i));
+        followerCount += followerDayCount;
+        extractedData.followersValues.push(followerCount);
+    }
 
     return extractedData;
 

@@ -27,17 +27,16 @@
         .card.second {
             grid-column: 8 / 12;
         }
-        .card.third {
-            grid-column: 1 / 4;
-            grid-row: 2 / 3;
+        .card.ecology {
+            grid-column: 1 / 6;
+            grid-row: 4 / 5;
         }
-        .card.fourth {
-            grid-column: 4 / 6;
-            grid-row: 2 / 3;
+        .card.security {
+            grid-column: 1 / 3;
         }
         .card.top-users {
             grid-column: 1 / 6;
-            grid-row: 3 / 5;
+            grid-row: 2 / 4;
         }
         .card.top-channels {
             grid-column: 6 / 12;
@@ -54,6 +53,9 @@
         }
         .card.about {
             grid-column: 1 / 6;
+        }
+        .card.followers {
+            grid-column: 6 / 12;
         }
     }
 </style>
