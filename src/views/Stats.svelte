@@ -137,12 +137,54 @@
                         labels: hoursLabels,
                         datasets: [
                             {
+                                name: 'messages',
                                 values: $data.hoursValues
+                            }
+                        ]
+                    }}
+                    axisOptions="{{
+                        xAxisMode: 'tick'
+                    }}"
+                    type="bar" />
+                </Card>
+                <Card name="top-users" title="Top Users/Groups">
+                    <p>Groups, sorted by the <b>received</b> messages count ⬇️</p>
+                    <Chart data={{
+                        labels: $data.topGroups.map((group) => group.name),
+                        datasets: [
+                            {
+                                name: 'messages',
+                                values: $data.topGroups.map((group) => group.messageCount)
+                            }
+                        ]
+                    }} maxSlices={7} type="donut" />
+                    <p>Groups, sorted by the <b>sent</b> messages count ⬆️</p>
+                    <Chart data={{
+                        labels: $data.topActiveGroups.map((group) => group.name),
+                        datasets: [
+                            {
+                                name: 'messages',
+                                values: $data.topActiveGroups.map((group) => group.sentMessageCount)
+                            }
+                        ]
+                    }} maxSlices={7} type="donut" />
+                </Card>
+                <Card name="months" title="Your Instagram Moments">
+                    <p>You were the most active on Instagram on { $data.messagesMonths.monthsLabels[$data.messagesMonths.monthsValues.indexOf(Math.max(...$data.messagesMonths.monthsValues))] }!</p>
+                    <Chart data={{
+                        labels: $data.messagesMonths.monthsLabels,
+                        datasets: [
+                            {
+                                name: 'messages',
+                                values: $data.messagesMonths.monthsValues
                             }
                         ]
                     }} axisOptions="{{
                         xAxisMode: 'tick'
-                    }}" type="bar" />
+                    }}" 
+                    lineOptions="{{
+                        dotSize: 4
+                    }}" type="line" />
                 </Card>
             </div>
         {/if}

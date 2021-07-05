@@ -95,12 +95,15 @@ export async function extractData (files) {
         totalMediaSize: 0,
 
         hoursValues: [],
+        messagesMonths: [],
+        topGroups: [],
 
         profilePicture: null,
         username: null
 
     };
 
+    let firstMessage = Date.now();
     const users = new Set();
     const chatsData = [];
     let username;
@@ -126,6 +129,7 @@ export async function extractData (files) {
                 name: null,
                 isGroup: null,
                 messageCount: null,
+                sentMessageCount: null,
                 messages: []
             };
 
@@ -154,6 +158,8 @@ export async function extractData (files) {
                                         if (message.reactions?.some((react) => react.actor === username)) extractedData.totalLikedMessageCount++;
 
                                         if (message.sender_name === username) {
+                                            chatData.sentMessageCount++;
+                                            if (message.timestamp_ms < firstMessage) firstMessage = message.timestamp_ms;
                                             chatData.messages.push({
                                                 content: message.content,
                                                 timestamp: message.timestamp_ms
@@ -201,16 +207,19 @@ export async function extractData (files) {
                             })
                         ).then(() => {
 
-                            chatsData.push(chatData);
-                            loadTask.set(`Loading messages... ${Math.ceil(chatsData.length / chats.length * 100)}%`);
-
                             resolveMessagesPromise();
                         });
 
                     });
 
                 });
-            })).then(() => resolveChatPromise());
+            })).then(() => {
+                
+                chatsData.push(chatData);
+                loadTask.set(`Loading messages... ${Math.ceil(chatsData.length / chats.length * 100)}%`);
+                resolveChatPromise();
+
+            });
 
         });
 
@@ -285,9 +294,36 @@ export async function extractData (files) {
 
     loadTask.set('Loading charts...');
 
+    const allMessages = chatsData.map((c) => c.messages).flat();
+
     for (let i = 0; i < 24; i++) {
-        extractedData.hoursValues.push(chatsData.map((c) => c.messages).flat().filter((m) => new Date(m.timestamp).getHours() === i).length);
+        extractedData.hoursValues.push(allMessages.filter((m) => new Date(m.timestamp).getHours() === i).length);
     }
+
+    const monthsLabels = [];
+    const monthsValues = [];
+    const formatDate = (date) => `${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    for (let i = new Date(firstMessage); i.getTime() <= Date.now(); i.setMonth(i.getMonth() + 1)) {
+        monthsLabels.push(formatDate(i));
+        monthsValues.push(allMessages.filter((m) => formatDate(new Date(m.timestamp)) === formatDate(i)).length);
+    }
+
+    extractedData.messagesMonths = {
+        monthsLabels,
+        monthsValues
+    };
+
+    const topGroups = chatsData.sort((a, b) => b.messageCount - a.messageCount).slice(0, 10);
+    extractedData.topGroups = topGroups.map((group) => ({
+        name: group.name,
+        messageCount: group.messageCount
+    }));
+
+    const topActiveGroups = chatsData.sort((a, b) => b.sentMessageCount - a.sentMessageCount).slice(0, 10);
+    extractedData.topActiveGroups = topActiveGroups.map((group) => ({
+        name: group.name,
+        sentMessageCount: group.sentMessageCount
+    }));
 
     return extractedData;
 

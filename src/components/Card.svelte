@@ -37,6 +37,7 @@
         }
         .card.top-users {
             grid-column: 1 / 6;
+            grid-row: 3 / 5;
         }
         .card.top-channels {
             grid-column: 6 / 12;
@@ -44,6 +45,9 @@
         .card.hours {
             grid-column: 6 / 12;
             grid-row: 2 / 3;
+        }
+        .card.months {
+            grid-column: 6 / 12;
         }
         .card.profile {
             grid-column: 1 / 4;
