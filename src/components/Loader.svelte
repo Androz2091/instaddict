@@ -22,6 +22,7 @@
         uz.register(AsyncUnzipInflate);
         const files = [];
         uz.onfile = (f) => files.push(f);
+        console.log(file.stream)
         if (!file.stream) {
             loading = false;
             error = 'This browser is not supported. Try using Google Chrome instead.';
