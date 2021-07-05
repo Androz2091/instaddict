@@ -63,6 +63,10 @@ path {
     max-width: var(--icon-dimensions);
 }
 
+.frappe-chart .x.axis .line-vertical {
+    display: none;
+}
+
 @media (max-width: 800px) {
     svg {
         --icon-dimensions: 2rem;
