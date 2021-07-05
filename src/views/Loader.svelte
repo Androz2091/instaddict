@@ -8,6 +8,7 @@
     let loading = false;
     let error = false;
     async function handleFile (file) {
+        console.log(`Reading package file...`);
         loading = true;
         const uz = new Unzip();
         uz.register(AsyncUnzipInflate);
@@ -29,6 +30,7 @@
                 uz.push(value.subarray(i, i + 65536));
             }
         }
+        console.log('File read.');
         /**
          * If the package is valid and have
          * all the required files files.
@@ -80,7 +82,6 @@
         }
     }
     function filePopup (event) {
-        if (event.target.classList.value.includes('help') || loading) return;
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', '.zip');
