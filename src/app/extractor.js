@@ -92,7 +92,9 @@ export async function extractData (files) {
 
         totalPhotoSize: 0,
         totalVoiceMessagesSize: 0,
-        totalStorySize: 0,
+        totalMediaSize: 0,
+
+        hoursValues: [],
 
         profilePicture: null,
         username: null
@@ -154,7 +156,7 @@ export async function extractData (files) {
                                         if (message.sender_name === username) {
                                             chatData.messages.push({
                                                 content: message.content,
-                                                timestamp: message.timestamp
+                                                timestamp: message.timestamp_ms
                                             });
                                         } else {
                                             extractedData.totalMessageCountReceived++;
@@ -181,10 +183,7 @@ export async function extractData (files) {
 
                                         else if (message.photos) {
 
-                                            if (message.sender_name === username) {
-                                                console.log(message)
-                                                extractedData.totalPhotoCountSent++;
-                                            }
+                                            if (message.sender_name === username) extractedData.totalPhotoCountSent++;
                                             else {
                                                 extractedData.totalPhotoCountReceived++;
                                                 resolveMessagePromise();
@@ -260,26 +259,34 @@ export async function extractData (files) {
         extractedData.profilePicture = picture;
     }
 
-    loadTask.set('Loading stories...');
+    loadTask.set('Loading ecology analytics...');
 
-    const storyImageRegex = /^media\/stories\/[0-9]+\/([a-z0-9_.]+)$/;
-    const storyImages = files.filter((f) => storyImageRegex.test(f.name)).map((f) => f.name);
-    let totalStorySize = 0;
+    const mediaRegex = /^media\/[a-z]+\/[0-9]+\/([a-z0-9_.]+)$/;
+    const medias = files.filter((f) => mediaRegex.test(f.name)).map((f) => f.name);
+    let totalMediaSize = 0;
     await Promise.all(
-        storyImages.map((storyImage) => {
+        medias.map((media) => {
             return new Promise((resolve) => {
-                readBlobFile(storyImage).then((file) => {
-                    totalStorySize += file.size;
+                readBlobFile(media).then((file) => {
+                    totalMediaSize += file.size;
                     resolve();
                 });
             });
         })
     );
-    extractedData.totalStorySize = formatBytes(totalStorySize);
+    extractedData.totalMediaSize = formatBytes(totalMediaSize);
+
+    loadTask.set('Loading stories...');
 
     const stories = JSON.parse(await readFile('content/stories.json'));
     if (stories) {
         extractedData.totalStoryCountSent = stories.ig_stories.length;
+    }
+
+    loadTask.set('Loading charts...');
+
+    for (let i = 0; i < 24; i++) {
+        extractedData.hoursValues.push(chatsData.map((c) => c.messages).flat().filter((m) => new Date(m.timestamp).getHours() === i).length);
     }
 
     return extractedData;

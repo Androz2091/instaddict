@@ -111,7 +111,7 @@
                     <FunFact
                         svg="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
                         content="You posted % of stories/posts"
-                        count="{ $data.totalStorySize }"
+                        count="{ $data.totalMediaSize }"
                     />
                 </Card>
                 <Card name="fourth" title="Security">
@@ -130,6 +130,19 @@
                         content="% logouts"
                         count="{ $data.totalLogoutCount }"
                     />
+                </Card>
+                <Card name="hours" title="Your Instagram Hours">
+                    <p>{ hoursLabels[$data.hoursValues.indexOf(Math.max(...$data.hoursValues))] } is definitely your favorite hour to chat with your friends!</p>
+                    <Chart data={{
+                        labels: hoursLabels,
+                        datasets: [
+                            {
+                                values: $data.hoursValues
+                            }
+                        ]
+                    }} axisOptions="{{
+                        xAxisMode: 'tick'
+                    }}" type="bar" />
                 </Card>
             </div>
         {/if}

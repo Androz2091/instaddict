@@ -32,7 +32,7 @@
             grid-row: 2 / 3;
         }
         .card.fourth {
-            grid-column: 4 / 7;
+            grid-column: 4 / 6;
             grid-row: 2 / 3;
         }
         .card.top-users {
