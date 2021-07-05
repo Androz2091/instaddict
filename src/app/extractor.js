@@ -60,9 +60,9 @@ export async function extractData (files) {
             file.ondata = (err, data, final) => {
                 fileContents.push(data);
                 if (final) {
-                    const binstr = Array.prototype.map.call(fileContents[0], function (ch) {
+                    const binstr = fileContents.map((c) => Array.prototype.map.call(c, function (ch) {
                         return String.fromCharCode(ch);
-                    }).join('');
+                    }).join('')).join('');
                     resolve(btoa(binstr));
                 }
             };
