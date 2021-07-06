@@ -33,6 +33,7 @@
     "svelte-frappe-charts": "^1.8.3",
     "svelte-routing": "^1.6.0",
     "svelte-simple-modal": "^1.0.0",
-    "svelte-tooltip": "^1.2.0"
+    "svelte-tooltip": "^1.2.0",
+    "unique-names-generator": "^4.5.0"
   }
 }
