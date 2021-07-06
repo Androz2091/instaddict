@@ -29,4 +29,4 @@ Instaddict is built with **[Svelte](https://svelte.dev)**, and is quite easy to 
 * Install the dependencies using `npm install` or `yarn install`.
 * Start the app using `npm run dev` or `yarn dev`!
 
-> Note: for testing purposes, you may append `?demo` to the URL to use the mocked data.
+> Note: for testing purposes, you may append use [this link](https://instaddict.androz2091.fr) to use the mocked data.
