@@ -1,5 +1,5 @@
 {
-  "name": "instaddict.me",
+  "name": "instaddict",
   "version": "0.1.0",
   "scripts": {
     "build": "rollup -c",
