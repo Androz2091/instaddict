@@ -339,10 +339,11 @@ export async function extractData (files) {
 
     const followers = JSON.parse(await readFile('followers_and_following/followers.json'));
     const allFollowers = followers.relationships_followers.map((f) => f.string_list_data[0]);
+    const firstFollowerTimestamp = allFollowers.sort((a, b) => a.timestamp - b.timestamp)[0].timestamp;
     const formatDayDate = (date) => `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     let followerCount = 0;
     extractedData.followersValues = [];
-    for (let i = new Date(firstMessage); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
+    for (let i = new Date(firstFollowerTimestamp); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
         const followerDayCount = allFollowers.filter((m) => formatDayDate(new Date(m.timestamp * 1000)) === formatDayDate(i)).length;
         extractedData.followersLabels.push(formatDayDate(i));
         followerCount += followerDayCount;
