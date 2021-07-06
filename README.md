@@ -8,7 +8,7 @@ How addicted are you to Instagram? Let's drop your data package into Instaddict,
 
 ### [DEMO](https://instaddict.androz2091.fr/stats/demo)
 
-![Example](./example.png)
+![Example](./assets/examples/example.png)
 
 ## How to Use
 
@@ -30,3 +30,18 @@ Instaddict is built with **[Svelte](https://svelte.dev)**, and is quite easy to 
 * Start the app using `npm run dev` or `yarn dev`!
 
 > Note: for testing purposes, you may append use [this link](https://instaddict.androz2091.fr/stats/demo) to use the mocked data.
+
+### Credits
+
+Huge thanks to all these people, without whom the development of this app would not have been possible!
+
+<table>
+  <tr>
+    <td align="center">
+        <a><img src="./assets/contribs/taps.png" width="100px;" alt=""/><br /><sub><b>Taps#5111</b></sub></a>
+    </td>
+    <td align="center">
+        <a><img src="./assets/contribs/mia.png" width="100px;" alt=""/><br /><sub><b>!Mia#0008</b></sub></a>
+    </td>
+  </tr>
+</table>
