@@ -1,14 +1,11 @@
 <script>
-	import { onMount } from 'svelte';
 	import { Router, Route } from 'svelte-routing';
-	import decodeJwt from 'jwt-decode';
 
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
 
 	import Stats from './views/Stats.svelte';
 	import Loader from './views/Loader.svelte';
-	import Help from './views/Help.svelte';
 
 	import Modal from 'svelte-simple-modal';
 
