@@ -1,6 +1,6 @@
 <script>
     import { blur } from 'svelte/transition';
-    import { data } from '../app/store';
+    import { data, restoreFromLocalStorage } from '../app/store';
     import generateDemoData from '../app/demo';
     import Chart from 'svelte-frappe-charts';
     import Modal from '../components/Modal.svelte';
@@ -18,12 +18,8 @@
     let timeout;
 
     onMount(() => {
-        if (window.location.href.includes('/demo')) {
 
-            const demoData = generateDemoData();
-            data.set(demoData);
-
-        } else if ($data) {
+        const successPopup = () => {
             toast.push('Your data has been loaded!', {
                 theme: {
                     '--toastBackground': '#48BB78',
@@ -34,7 +30,19 @@
             timeout = setTimeout(() => {
                 // TODO: showModal('<div style="text-align: center">Like what you see?<br><a href="https://androz2091.fr/discord" target="_blank">Support us by saying hello and sharing your stats in our Discord server!<a></div>');
             }, 10000);
-        } else navigate('/');
+        };
+
+        if (window.location.href.includes('/demo')) {
+
+            const demoData = generateDemoData();
+            data.set(demoData);
+
+        } else if (!$data) {
+            const restored = restoreFromLocalStorage();
+            if (!restored) return navigate('/');
+        }
+        
+        successPopup();
     });
 
     onDestroy(() => timeout && clearTimeout(timeout));
