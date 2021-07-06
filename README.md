@@ -1,6 +1,6 @@
-<img width="180" height="180" align="left" style="float: left; margin: 0 10px 0 0;" alt="DDPE" src="https://github.com/Androz2091/instaddict/raw/master/public/favicon.png">  
+<img width="160" height="160" align="left" style="float: left; margin: 0 10px 0 0;" alt="DDPE" src="https://github.com/Androz2091/instaddict/raw/master/public/favicon.png">  
 
-# [Instaddict](https://instaddict.androz2091.fr)
+# [Instaddict](https://instaddict.androz2091.fr) (beta)
 
 How addicted are you to Instagram? Let's drop your data package into Instaddict, it will give you the answer.
 ㅤㅤㅤㅤㅤㅤㅤㅤ
