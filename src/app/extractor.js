@@ -259,18 +259,18 @@ export async function extractData (files) {
     loadTask.set('Loading polls activities...');
 
     const polls = JSON.parse(await readFile('story_sticker_interactions/polls.json'));
-    extractedData.totalPollAnsweredCount = polls.story_activities_polls?.length || 0;
+    extractedData.totalPollAnsweredCount = polls?.story_activities_polls.length || 0;
 
     loadTask.set('Loading security analytics...');
 
     const passwordChangeActivity = JSON.parse(await readFile('login_and_account_creation/password_change_activity.json'));
-    extractedData.totalPasswordChangeCount = passwordChangeActivity.account_history_password_change_history?.length || 0;
+    extractedData.totalPasswordChangeCount = passwordChangeActivity?.account_history_password_change_history.length || 0;
 
     const loginActivity = JSON.parse(await readFile('login_and_account_creation/login_activity.json'));
-    extractedData.totalLoginCount = loginActivity.account_history_login_history?.length || 0;
+    extractedData.totalLoginCount = loginActivity?.account_history_login_history.length || 0;
 
     const logoutActivity = JSON.parse(await readFile('login_and_account_creation/logout_activity.json'));
-    extractedData.totalLogoutCount = logoutActivity.account_history_logout_history?.length || 0;
+    extractedData.totalLogoutCount = logoutActivity?.account_history_logout_history.length || 0;
 
     loadTask.set('Loading profile picture...');
 
