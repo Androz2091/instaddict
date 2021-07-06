@@ -1,8 +1,13 @@
 import { DecodeUTF8 } from 'fflate';
 import { formatBytes, getFavoriteWords } from './helpers';
 import { loadTask } from './store';
+import PQueue from 'p-queue';
 
 export async function extractData (files) {
+
+    const queue = new PQueue({
+        concurrency: 1
+    });
 
     const getFile = (name) => files.find((file) => file.name === name);
 
@@ -172,19 +177,24 @@ export async function extractData (files) {
 
                                         if (message.audio_files && message.audio_files[0].uri.startsWith('messages')) {
 
-                                            readBlobFile(message.audio_files[0].uri).then((file) => {
+                                            queue.add(() => {
+                                                return new Promise((resolveQueuePromise) => {
+                                                    readBlobFile(message.audio_files[0].uri).then((file) => {
 
-                                                getVideoDuration(file).then((duration) => {
-    
-                                                    if (message.sender_name === username) {
-                                                        totalVoiceMessagesSize += file.size;
-                                                        totalVoiceMessagesSeconds += duration;
-                                                    }
-                                                    else totalVoiceMessagesSecondsReceived += duration;
-                                                    resolveMessagePromise();
-    
+                                                        getVideoDuration(file).then((duration) => {
+            
+                                                            if (message.sender_name === username) {
+                                                                totalVoiceMessagesSize += file.size;
+                                                                totalVoiceMessagesSeconds += duration;
+                                                            }
+                                                            else totalVoiceMessagesSecondsReceived += duration;
+                                                            resolveMessagePromise();
+                                                            resolveQueuePromise();
+            
+                                                        });
+                                                                                            
+                                                    });
                                                 });
-                                                                                    
                                             });
 
                                         }
