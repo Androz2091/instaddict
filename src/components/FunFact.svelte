@@ -26,7 +26,7 @@
         {#if explanation && !isNaN(count)}
             <small>{ explanation }</small>
         {:else if !count && content}
-            <small>This data is not available as you changed your Discord privacy settings</small>
+            <small>This data is not available...</small>
         {/if}
     </slot>
 </div>
