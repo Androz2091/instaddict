@@ -96,7 +96,7 @@
         <div class="app-loader-boxes">
             <p class="app-loader-description"><a href="/" use:link>Instaddict</a> is a site that generates stats from your Instagram Data Package. It is your device that processes the data, nothing is sent to any server!</p>
             <p>
-                <a class="app-loader-tuto" href="/help" use:link>
+                <a class="app-loader-tuto" href="https://www.instagram.com/download/request/" target="_blank">
                     <small class="app-loader-tag tag">1</small>
                     Get my Instagram JSON data 👆
                     <br>
