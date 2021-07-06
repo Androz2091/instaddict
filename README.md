@@ -10,8 +10,6 @@ How addicted are you to Instagram? Let's give your data package to Instaddict, i
 
 ![Example](./example.png)
 
-![Example2](./example2.png)
-
 ## How to Use
 
 * Ask for your data file in Instagram (format **must be json**) (`Settings` > `Privacy & Safety`)
