@@ -9,10 +9,6 @@
         padding-top: 7rem;
 		max-width: 768px;
 	}
-    .tiktok-player {
-        margin-top: 2rem;
-        text-align: center;
-    }
     @media (min-width: 1080px) {
         .help {
             margin: auto;
