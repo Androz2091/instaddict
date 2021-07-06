@@ -2,7 +2,7 @@
 
 # [Instaddict](https://instaddict.androz2091.fr)
 
-How addicted are you to Instagram? Let's give your data package to Instaddict, it will give you the answer.
+How addicted are you to Instagram? Let's drop your data package into Instaddict, it will give you the answer.
 ㅤㅤㅤㅤㅤㅤㅤㅤ
 ## Example
 
