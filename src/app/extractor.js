@@ -343,7 +343,7 @@ export async function extractData (files) {
     const formatDayDate = (date) => `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     let followerCount = 0;
     extractedData.followersValues = [];
-    for (let i = new Date(firstFollowerTimestamp); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
+    for (let i = new Date(firstFollowerTimestamp * 1000); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
         const followerDayCount = allFollowers.filter((m) => formatDayDate(new Date(m.timestamp * 1000)) === formatDayDate(i)).length;
         extractedData.followersLabels.push(formatDayDate(i));
         followerCount += followerDayCount;
