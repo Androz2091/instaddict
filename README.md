@@ -2,18 +2,18 @@
 
 # [Instaddict](https://instaddict.androz2091.fr)
 
-What's **really** in your Discord Data package? And how can this data be useful? Discord Data Package Explorer does the job for you!
+How addicted are you to Instagram? Let's give your data package to Instaddict, it will give you the answer.
 
 ## Example
 
-### [DEMO](https://ddpe.androz2091.fr/stats/demo)
+### [DEMO](https://instaddict.androz2091.fr/stats/demo)
 
 ![Example](./example.png)
 
 ## How to Use
 
-* Ask for your data file in Discord (`Settings` > `Privacy & Safety`)
-* Open **https://ddpe.androz2091.fr**
+* Ask for your data file in Instagram (format **must be json**) (`Settings` > `Privacy & Safety`)
+* Open **https://instaddict.androz2091.fr**
 * and import your data file!
 
 ### Docker
@@ -23,7 +23,7 @@ and you can access the app at http://localhost:5000.
 
 ### Manual Installation
 
-Discord Data Package Explorer is built with **[Svelte](https://svelte.dev)**, and is quite easy to install.
+Instaddict is built with **[Svelte](https://svelte.dev)**, and is quite easy to install.
 
 * Clone the repository.
 * Install the dependencies using `npm install` or `yarn install`.
