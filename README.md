@@ -1,4 +1,4 @@
-<img width="200" height="200" align="left" style="float: left; margin: 0 10px 0 0;" alt="DDPE" src="https://github.com/Androz2091/instaddict/raw/master/public/favicon.png">  
+<img width="150" height="150" align="left" style="float: left; margin: 0 10px 0 0;" alt="DDPE" src="https://github.com/Androz2091/instaddict/raw/master/public/favicon.png">  
 
 # [Instaddict](https://instaddict.androz2091.fr)
 
