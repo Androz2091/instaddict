@@ -3,12 +3,14 @@
 # [Instaddict](https://instaddict.androz2091.fr)
 
 How addicted are you to Instagram? Let's give your data package to Instaddict, it will give you the answer.
-
+ㅤㅤㅤㅤㅤㅤㅤㅤ
 ## Example
 
 ### [DEMO](https://instaddict.androz2091.fr/stats/demo)
 
 ![Example](./example.png)
+
+![Example2](./example2.png)
 
 ## How to Use
 
