@@ -82,6 +82,6 @@ export default () => {
         }, [0]),
 
         profilePicture: null,
-        username: 'Simon'
+        username: 'User'
     };
 };
