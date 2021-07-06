@@ -33,7 +33,7 @@ Instaddict is built with **[Svelte](https://svelte.dev)**, and is quite easy to 
 
 ### Credits
 
-Huge thanks to all these people, without whom the development of this app would not have been possible!
+Huge thanks to all these people who agreed to share their Instagram data package for the tests, without whom the development of this app would not have been possible!
 
 <table>
   <tr>
