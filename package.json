@@ -25,6 +25,7 @@
     "axios": "^0.21.1",
     "fflate": "^0.7.1",
     "p-queue": "^7.1.0",
+    "sass": "^1.35.1",
     "sirv-cli": "^1.0.12",
     "snake-case": "^3.0.4",
     "svelte-frappe-charts": "^1.8.3",
