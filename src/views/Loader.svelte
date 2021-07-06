@@ -31,25 +31,18 @@
             }
         }
         console.log('File read.');
-        /**
-         * If the package is valid and have
-         * all the required files files.
-         */
-        const validPackage = (() => {
-            const requiredFiles = [
-                'README.txt',
-                'account/user.json',
-                'messages/index.json',
-                'servers/index.json'
-            ];
-            for (const requiredFile of requiredFiles) {
-                if (! files.some((file) => file.name === requiredFile)) {
-                    // TODO: add validation
-                    // return false;
-                }
-            }
-            return true;
-        })();
+        let validPackage = true;
+        if (files.some((file) => file.name === 'index.html')) {
+            error = 'We need the data as JSON format, not HTML one! Ask your data again and check JSON 😉';
+            loading = false;
+            return;
+        }
+        const requiredFiles = [
+            'account_information/account_information.json'
+        ];
+        for (const requiredFile of requiredFiles) {
+            if (!files.some((file) => file.name === requiredFile)) return false;
+        }
         if (!validPackage) {
             error = 'Your package seems to be corrupted. Click or drop your package file here to retry';
             loading = false;
