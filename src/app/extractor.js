@@ -177,7 +177,9 @@ export async function extractData (files) {
 
                                         if (message.audio_files && message.audio_files[0].uri.startsWith('messages')) {
 
-                                            queue.add(() => {
+                                            resolveMessagePromise();
+
+                                            /*queue.add(() => {
                                                 return new Promise((resolveQueuePromise) => {
                                                     readBlobFile(message.audio_files[0].uri).then((file) => {
 
@@ -195,7 +197,7 @@ export async function extractData (files) {
                                                                                             
                                                     });
                                                 });
-                                            });
+                                            });*/
 
                                         }
 
@@ -282,7 +284,7 @@ export async function extractData (files) {
 
     loadTask.set('Loading ecology analytics...');
 
-    const mediaRegex = /^media\/[a-z]+\/[0-9]+\/([a-z0-9_.]+)$/;
+    /*const mediaRegex = /^media\/[a-z]+\/[0-9]+\/([a-z0-9_.]+)$/;
     const medias = files.filter((f) => mediaRegex.test(f.name)).map((f) => f.name);
     let totalMediaSize = 0;
     await Promise.all(
@@ -295,7 +297,7 @@ export async function extractData (files) {
             });
         })
     );
-    extractedData.totalMediaSize = formatBytes(totalMediaSize);
+    extractedData.totalMediaSize = formatBytes(totalMediaSize);*/
 
     loadTask.set('Loading stories...');
 
