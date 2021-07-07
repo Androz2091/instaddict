@@ -209,12 +209,13 @@ export async function extractData (files) {
                                                 resolveMessagePromise();
                                             }
 
-                                            readBlobFile(message.photos[0].uri).then((file) => {
+                                            /*readBlobFile(message.photos[0].uri).then((file) => {
 
                                                 totalPhotoSize += file.size;
 
                                                 resolveMessagePromise();
-                                            });
+                                            });*/
+                                            resolveMessagePromise();
                                         } else resolveMessagePromise();
 
                                     });
