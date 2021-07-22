@@ -207,9 +207,11 @@ export async function extractData (files) {
                                                 resolveMessagePromise();
                                             }
 
-                                            readBlobFile(message.photos[0].uri).then((file) => {
+                                            if(message.photos[0].uri.startsWith('https://')) resolveMessagePromise();
 
-                                                totalPhotoSize += file.size;
+                                            else readBlobFile(message.photos[0].uri).then((file) => {
+
+                                                if(file && file.size) totalPhotoSize += file.size;
 
                                                 resolveMessagePromise();
                                             });
