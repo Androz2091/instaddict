@@ -119,7 +119,7 @@ export async function extractData (files) {
     let totalPhotoSize = 0;
     let totalVoiceMessagesSize = 0;
 
-    const chatRegex = /^messages\/inbox\/([0-9a-z_]+)\/message_1\.json$/;
+    const chatRegex = /^messages\/inbox\/([0-9a-z_-]+)\/message_1\.json$/;
     const chats = files.filter((f) => chatRegex.test(f.name)).map((f) => f.name.match(chatRegex)[1]);
 
     loadTask.set('Loading user messages...');
@@ -207,9 +207,11 @@ export async function extractData (files) {
                                                 resolveMessagePromise();
                                             }
 
-                                            readBlobFile(message.photos[0].uri).then((file) => {
+                                            if(message.photos[0].uri.startsWith('https://')) resolveMessagePromise();
 
-                                                totalPhotoSize += file.size;
+                                            else readBlobFile(message.photos[0].uri).then((file) => {
+
+                                                if(file && file.size) totalPhotoSize += file.size;
 
                                                 resolveMessagePromise();
                                             });
