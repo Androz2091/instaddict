@@ -336,9 +336,8 @@ export async function extractData (files) {
         name: group.name,
         sentMessageCount: group.sentMessageCount
     }));
-
-    const followers = JSON.parse(await readFile('followers_and_following/followers.json'));
-    const allFollowers = followers.relationships_followers.map((f) => f.string_list_data[0]);
+    
+    const allFollowers = JSON.parse(await readFile('followers_and_following/followers.json')) ? JSON.parse(await readFile('followers_and_following/followers.json')).relationships_followers.map((f) => f.string_list_data[0]) : JSON.parse(await readFile('followers_and_following/followers_1.json')).map((f) => f.string_list_data[0]);
     const firstFollowerTimestamp = allFollowers.sort((a, b) => a.timestamp - b.timestamp)[0].timestamp;
     const formatDayDate = (date) => `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     let followerCount = 0;
