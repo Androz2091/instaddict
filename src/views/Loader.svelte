@@ -38,10 +38,18 @@
             return;
         }
         const requiredFiles = [
-            'account_information/account_information.json'
+            'account_information/account_information.json',
+            'personal_information/account_information.json'
         ];
+        let foundRequiredFile = false;
         for (const requiredFile of requiredFiles) {
-            if (!files.some((file) => file.name === requiredFile)) return false;
+          if (files.some((file) => file.name === requiredFile)) {
+            foundRequiredFile = true;
+            break;
+          }
+        }
+        if (!foundRequiredFile) {
+          return false;
         }
         if (!validPackage) {
             error = 'Your package seems to be corrupted. Click or drop your package file here to retry';
