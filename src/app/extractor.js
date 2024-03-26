@@ -404,10 +404,10 @@ export async function extractData(files) {
   }));
 
   const allFollowers = JSON.parse(
-    await readFile("followers_and_following/followers.json")
+    await readFile("connections/followers_and_following/followers.json")
   )
     ? JSON.parse(
-        await readFile("followers_and_following/followers.json")
+        await readFile("connections/followers_and_following/followers.json")
       ).relationships_followers.map((f) => f.string_list_data[0])
     : JSON.parse(
         await readFile("connections/followers_and_following/followers_1.json")

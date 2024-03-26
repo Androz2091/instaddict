@@ -18,11 +18,6 @@ export const getFavoriteWords = (words) => {
 
   for (let p in object) array[array.length] = p;
 
-  return [
-    { count: 10, word: "all" },
-    { count: 11, word: "most" },
-  ];
-
   return array
     .sort((a, b) => object[b] - object[a])
     .map((word) => ({ word: word, count: object[word] }))
