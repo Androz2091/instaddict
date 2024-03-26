@@ -1,354 +1,438 @@
-import { DecodeUTF8 } from 'fflate';
-import { formatBytes, getFavoriteWords } from './helpers';
-import { loadTask } from './store';
-import PQueue from 'p-queue';
+import { DecodeUTF8 } from "fflate";
+import { formatBytes, getFavoriteWords } from "./helpers";
+import { loadTask } from "./store";
+import PQueue from "p-queue";
 
-export async function extractData (files) {
+export async function extractData(files) {
+  const queue = new PQueue({
+    concurrency: 1,
+  });
 
-    const queue = new PQueue({
-        concurrency: 1
+  const getFile = (name) => files.find((file) => file.name === name);
+
+  const getVideoDuration = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src);
+        resolve(video.duration);
+      };
+
+      video.src = URL.createObjectURL(file);
     });
+  };
 
-    const getFile = (name) => files.find((file) => file.name === name);
+  const readFile = (name) => {
+    return new Promise((resolve) => {
+      const file = getFile(name);
+      if (!file) return resolve(null);
+      const fileContent = [];
+      const decoder = new DecodeUTF8();
+      file.ondata = (err, data, final) => {
+        decoder.push(data, final);
+      };
+      decoder.ondata = (str, final) => {
+        fileContent.push(str);
+        if (final) resolve(fileContent.join(""));
+      };
+      file.start();
+    });
+  };
 
-    const getVideoDuration = (file) => {
-        return new Promise((resolve) => {
-            const video = document.createElement('video');
-            video.preload = 'metadata';
-        
-            video.onloadedmetadata = function() {
-        
-                window.URL.revokeObjectURL(video.src);
-                resolve(video.duration);
-            }
-        
-            video.src = URL.createObjectURL(file);
-        });
-    }
-    
+  const readBlobFile = (name) => {
+    return new Promise((resolve) => {
+      const file = getFile(name);
+      if (!file) return resolve(null);
+      const fileContents = [];
+      file.ondata = (err, data, final) => {
+        fileContents.push(data);
+        if (final) resolve(new Blob(fileContents));
+      };
+      file.start();
+    });
+  };
 
-    const readFile = (name) => {
-        return new Promise((resolve) => {
-            const file = getFile(name);
-            if (!file) return resolve(null);
-            const fileContent = [];
-            const decoder = new DecodeUTF8();
-            file.ondata = (err, data, final) => {
-                decoder.push(data, final);
-            };
-            decoder.ondata = (str, final) => {
-                fileContent.push(str);
-                if (final) resolve(fileContent.join(''));
-            };
-            file.start();
-        });
-    };
+  const readImageFile = (name) => {
+    return new Promise((resolve) => {
+      const file = getFile(name);
+      if (!file) return resolve(null);
+      const fileContents = [];
+      file.ondata = (err, data, final) => {
+        fileContents.push(data);
+        if (final) {
+          const binstr = fileContents
+            .map((c) =>
+              Array.prototype.map
+                .call(c, function (ch) {
+                  return String.fromCharCode(ch);
+                })
+                .join("")
+            )
+            .join("");
+          resolve(btoa(binstr));
+        }
+      };
+      file.start();
+    });
+  };
 
-    const readBlobFile = (name) => {
-        return new Promise((resolve) => {
-            const file = getFile(name);
-            if (!file) return resolve(null);
-            const fileContents = [];
-            file.ondata = (err, data, final) => {
-                fileContents.push(data);
-                if (final) resolve(new Blob(fileContents));
-            };
-            file.start();
-        });
-    }
+  const extractedData = {
+    mostUsedWords: [],
 
-    const readImageFile = (name) => {
-        return new Promise((resolve) => {
-            const file = getFile(name);
-            if (!file) return resolve(null);
-            const fileContents = [];
-            file.ondata = (err, data, final) => {
-                fileContents.push(data);
-                if (final) {
-                    const binstr = fileContents.map((c) => Array.prototype.map.call(c, function (ch) {
-                        return String.fromCharCode(ch);
-                    }).join('')).join('');
-                    resolve(btoa(binstr));
-                }
-            };
-            file.start();
-        });
-    }
+    totalUserCount: 0,
+    totalMessageCount: 0,
+    totalVoiceMessagesMinutes: 0,
+    totalLikedMessageCount: 0,
+    totalPhotoCountSent: 0,
+    totalStoryCountSent: 0,
 
-    const extractedData = {
+    totalPhotoCountReceived: 0,
+    totalMessageCountReceived: 0,
+    totalVoiceMessagesMinutesReceived: 0,
 
-        mostUsedWords: [],
+    totalPollAnsweredCount: 0,
+    totalChangePasswordCount: 0,
+    totalLoginCount: 0,
+    totalLogoutCount: 0,
 
-        totalUserCount: 0,
-        totalMessageCount: 0,
-        totalVoiceMessagesMinutes: 0,
-        totalLikedMessageCount: 0,
-        totalPhotoCountSent: 0,
-        totalStoryCountSent: 0,
+    totalPhotoSize: 0,
+    totalVoiceMessagesSize: 0,
+    totalMediaSize: 0,
 
-        totalPhotoCountReceived: 0,
-        totalMessageCountReceived: 0,
-        totalVoiceMessagesMinutesReceived: 0,
+    hoursValues: [],
+    messagesMonths: [],
+    topGroups: [],
+    followersLabels: [],
+    followersValues: [],
 
-        totalPollAnsweredCount: 0,
-        totalChangePasswordCount: 0,
-        totalLoginCount: 0,
-        totalLogoutCount: 0,
+    profilePicture: null,
+    username: null,
+  };
 
-        totalPhotoSize: 0,
-        totalVoiceMessagesSize: 0,
-        totalMediaSize: 0,
+  let firstMessage = Date.now();
+  const users = new Set();
+  const chatsData = [];
+  let username;
+  let totalVoiceMessagesSeconds = 0;
+  let totalVoiceMessagesSecondsReceived = 0;
+  let totalPhotoSize = 0;
+  let totalVoiceMessagesSize = 0;
 
-        hoursValues: [],
-        messagesMonths: [],
-        topGroups: [],
-        followersLabels: [],
-        followersValues: [],
+  const chatRegex =
+    /^your_instagram_activity\/messages\/inbox\/([0-9a-z_]+)\/message_1\.json$/;
+  const chats = files
+    .filter((f) => chatRegex.test(f.name))
+    .map((f) => f.name.match(chatRegex)[1]);
 
-        profilePicture: null,
-        username: null
+  loadTask.set("Loading user messages...");
 
-    };
+  await Promise.all(
+    chats.map((chat) => {
+      return new Promise((resolveChatPromise) => {
+        const messageRegex = /message_([0-9]+)\.json$/;
+        const messageIndexes = files
+          .filter(
+            (f) =>
+              f.name.startsWith(
+                `your_instagram_activity/messages/inbox/${chat}`
+              ) && messageRegex.test(f.name)
+          )
+          .map((f) => f.name.match(messageRegex)[1]);
 
-    let firstMessage = Date.now();
-    const users = new Set();
-    const chatsData = [];
-    let username;
-    let totalVoiceMessagesSeconds = 0;
-    let totalVoiceMessagesSecondsReceived = 0;
-    let totalPhotoSize = 0;
-    let totalVoiceMessagesSize = 0;
+        const chatData = {
+          name: null,
+          isGroup: null,
+          messageCount: null,
+          sentMessageCount: null,
+          messages: [],
+        };
 
-    const chatRegex = /^messages\/inbox\/([0-9a-z_]+)\/message_1\.json$/;
-    const chats = files.filter((f) => chatRegex.test(f.name)).map((f) => f.name.match(chatRegex)[1]);
+        Promise.all(
+          messageIndexes.map((messageIndex) => {
+            return new Promise((resolveMessagesPromise) => {
+              readFile(
+                `your_instagram_activity/messages/inbox/${chat}/message_${messageIndex}.json`
+              ).then((messageFileContent) => {
+                const content = JSON.parse(messageFileContent);
 
-    loadTask.set('Loading user messages...');
-    
-    await Promise.all(chats.map((chat) => {
-        return new Promise((resolveChatPromise) => {
+                if (!username && content.participants.length === 2)
+                  username = content.participants[1].name;
+                else if (!username && content.participants.length > 2)
+                  username = content.participants[0].name;
 
-            const messageRegex = /message_([0-9]+)\.json$/;
-            const messageIndexes = files
-                .filter((f) => f.name.startsWith(`messages/inbox/${chat}`) && messageRegex.test(f.name))
-                .map((f) => f.name.match(messageRegex)[1]);
+                chatData.isGroup = content.participants.length > 2;
+                chatData.messageCount += content.messages.length;
+                chatData.name = decodeURIComponent(escape(content.title));
 
-            const chatData = {
-                name: null,
-                isGroup: null,
-                messageCount: null,
-                sentMessageCount: null,
-                messages: []
-            };
+                Promise.all(
+                  content.messages.map((message) => {
+                    return new Promise(async (resolveMessagePromise) => {
+                      users.add(message.sender_name);
 
-            Promise.all(messageIndexes.map((messageIndex) => {
-                return new Promise((resolveMessagesPromise) => {
-                    
-                    readFile(`messages/inbox/${chat}/message_${messageIndex}.json`).then((messageFileContent) => {
+                      if (
+                        message.reactions?.some(
+                          (react) => react.actor === username
+                        )
+                      )
+                        extractedData.totalLikedMessageCount++;
 
-                        const content = JSON.parse(messageFileContent);
-                        
-                        if (!username && content.participants.length === 2) username = content.participants[1].name;
-                        else if (!username && content.participants.length > 2) username = content.participants[0].name;
-
-                        chatData.isGroup = content.participants.length > 2;
-                        chatData.messageCount += content.messages.length;
-                        chatData.name = decodeURIComponent(escape(content.title));
-
-                        Promise.all(
-                            content.messages
-                                .map((message) => {
-
-                                    return new Promise((resolveMessagePromise) => {
-
-                                        users.add(message.sender_name);
-
-                                        if (message.reactions?.some((react) => react.actor === username)) extractedData.totalLikedMessageCount++;
-
-                                        if (message.sender_name === username) {
-                                            chatData.sentMessageCount++;
-                                            if (message.timestamp_ms < firstMessage) firstMessage = message.timestamp_ms;
-                                            chatData.messages.push({
-                                                content: message.content,
-                                                timestamp: message.timestamp_ms
-                                            });
-                                        } else {
-                                            extractedData.totalMessageCountReceived++;
-                                        }
-
-                                        if (message.audio_files && message.audio_files[0].uri.startsWith('messages')) {
-
-                                            queue.add(() => {
-                                                return new Promise((resolveQueuePromise) => {
-                                                    readBlobFile(message.audio_files[0].uri).then((file) => {
-
-                                                        getVideoDuration(file).then((duration) => {
-            
-                                                            if (message.sender_name === username) {
-                                                                totalVoiceMessagesSize += file.size;
-                                                                totalVoiceMessagesSeconds += duration;
-                                                            }
-                                                            else totalVoiceMessagesSecondsReceived += duration;
-                                                            resolveMessagePromise();
-                                                            resolveQueuePromise();
-            
-                                                        });
-                                                                                            
-                                                    });
-                                                });
-                                            });
-
-                                        }
-
-                                        else if (message.photos) {
-
-                                            if (message.sender_name === username) extractedData.totalPhotoCountSent++;
-                                            else {
-                                                extractedData.totalPhotoCountReceived++;
-                                                resolveMessagePromise();
-                                            }
-
-                                            readBlobFile(message.photos[0].uri).then((file) => {
-
-                                                totalPhotoSize += file.size;
-
-                                                resolveMessagePromise();
-                                            });
-                                        } else resolveMessagePromise();
-
-                                    });
-                            })
-                        ).then(() => {
-
-                            resolveMessagesPromise();
+                      if (message.sender_name === username) {
+                        chatData.sentMessageCount++;
+                        if (message.timestamp_ms < firstMessage)
+                          firstMessage = message.timestamp_ms;
+                        chatData.messages.push({
+                          content: message.content,
+                          timestamp: message.timestamp_ms,
                         });
+                      } else {
+                        extractedData.totalMessageCountReceived++;
+                      }
 
+                      if (
+                        message.audio_files &&
+                        message.audio_files[0].uri.startsWith(
+                          "your_activity_across_facebook/messages"
+                        )
+                      ) {
+                        queue.add(() => {
+                          return new Promise((resolveQueuePromise) => {
+                            readBlobFile(message.audio_files[0].uri).then(
+                              (file) => {
+                                getVideoDuration(file).then((duration) => {
+                                  if (message.sender_name === username) {
+                                    totalVoiceMessagesSize += file.size;
+                                    totalVoiceMessagesSeconds += duration;
+                                  } else
+                                    totalVoiceMessagesSecondsReceived +=
+                                      duration;
+                                  resolveMessagePromise();
+                                  resolveQueuePromise();
+                                });
+                              }
+                            );
+                          });
+                        });
+                      } else if (message.photos) {
+                        if (message.sender_name === username)
+                          extractedData.totalPhotoCountSent++;
+                        else {
+                          extractedData.totalPhotoCountReceived++;
+                          resolveMessagePromise();
+                        }
+
+                        readBlobFile(message.photos[0]?.uri).then((file) => {
+                          if (!file) {
+                            resolveMessagePromise();
+                            return;
+                          }
+
+                          totalPhotoSize += file.size;
+
+                          resolveMessagePromise();
+                        });
+                      } else resolveMessagePromise();
                     });
-
+                  })
+                ).then(() => {
+                  resolveMessagesPromise();
                 });
-            })).then(() => {
-                
-                chatsData.push(chatData);
-                loadTask.set(`Loading messages... ${Math.ceil(chatsData.length / chats.length * 100)}%`);
-                resolveChatPromise();
-
+              });
             });
-
+          })
+        ).then(() => {
+          chatsData.push(chatData);
+          loadTask.set(
+            `Loading messages... ${Math.ceil(
+              (chatsData.length / chats.length) * 100
+            )}%`
+          );
+          resolveChatPromise();
         });
+      });
+    })
+  );
 
-    }));
+  loadTask.set("Calculating messages statistics...");
 
-    loadTask.set('Calculating messages statistics...');
+  extractedData.username = username;
+  extractedData.totalUserCount = users.size;
+  extractedData.totalVoiceMessagesMinutes = Math.ceil(
+    totalVoiceMessagesSeconds / 60
+  );
+  extractedData.totalVoiceMessagesMinutesReceived = Math.ceil(
+    totalVoiceMessagesSecondsReceived / 60
+  );
 
-    extractedData.username = username;
-    extractedData.totalUserCount = users.size;
-    extractedData.totalVoiceMessagesMinutes = Math.ceil(totalVoiceMessagesSeconds / 60);
-    extractedData.totalVoiceMessagesMinutesReceived = Math.ceil(totalVoiceMessagesSecondsReceived / 60);
+  const messages = chatsData.map((chat) => chat.messages).flat();
+  extractedData.totalMessageCount = messages.length;
 
-    const messages = chatsData.map((chat) => chat.messages).flat();
-    extractedData.totalMessageCount = messages.length;
+  const words = messages
+    .filter((message) => message.content)
+    .map((message) => message.content.split(" "))
+    .flat()
+    .filter((w) => w.length > 5);
+  extractedData.favoriteWords = getFavoriteWords(words).map((w) => ({
+    count: w.count,
+    word: decodeURIComponent(escape(w.word)),
+  }));
 
-    const words = messages.filter((message) => message.content).map((message) => message.content.split(' ')).flat().filter((w) => w.length > 5);
-    extractedData.favoriteWords = getFavoriteWords(words).map((w) => ({
-        count: w.count,
-        word: decodeURIComponent(escape(w.word))
-    }));
+  extractedData.totalPhotoSize = formatBytes(totalPhotoSize);
+  extractedData.totalVoiceMessagesSize = formatBytes(totalVoiceMessagesSize);
 
-    extractedData.totalPhotoSize = formatBytes(totalPhotoSize);
-    extractedData.totalVoiceMessagesSize = formatBytes(totalVoiceMessagesSize);
+  loadTask.set("Loading polls activities...");
 
-    loadTask.set('Loading polls activities...');
+  const polls = JSON.parse(
+    await readFile("story_sticker_interactions/polls.json")
+  );
+  extractedData.totalPollAnsweredCount =
+    polls?.story_activities_polls.length || 0;
 
-    const polls = JSON.parse(await readFile('story_sticker_interactions/polls.json'));
-    extractedData.totalPollAnsweredCount = polls?.story_activities_polls.length || 0;
+  loadTask.set("Loading security analytics...");
 
-    loadTask.set('Loading security analytics...');
+  const passwordChangeActivity = JSON.parse(
+    await readFile(
+      "security_and_login_information/login_and_account_creation/password_change_activity.json"
+    )
+  );
+  extractedData.totalPasswordChangeCount =
+    passwordChangeActivity?.account_history_password_change_history.length || 0;
 
-    const passwordChangeActivity = JSON.parse(await readFile('login_and_account_creation/password_change_activity.json'));
-    extractedData.totalPasswordChangeCount = passwordChangeActivity?.account_history_password_change_history.length || 0;
+  const loginActivity = JSON.parse(
+    await readFile(
+      "security_and_login_information/login_and_account_creation/login_activity.json"
+    )
+  );
+  extractedData.totalLoginCount =
+    loginActivity?.account_history_login_history.length || 0;
 
-    const loginActivity = JSON.parse(await readFile('login_and_account_creation/login_activity.json'));
-    extractedData.totalLoginCount = loginActivity?.account_history_login_history.length || 0;
+  const logoutActivity = JSON.parse(
+    await readFile(
+      "security_and_login_information/login_and_account_creation/logout_activity.json"
+    )
+  );
+  extractedData.totalLogoutCount =
+    logoutActivity?.account_history_logout_history.length || 0;
 
-    const logoutActivity = JSON.parse(await readFile('login_and_account_creation/logout_activity.json'));
-    extractedData.totalLogoutCount = logoutActivity?.account_history_logout_history.length || 0;
+  loadTask.set("Loading profile picture...");
 
-    loadTask.set('Loading profile picture...');
-
-    const profilePicture = JSON.parse(await readFile('content/profile_photos.json'));
-    if (profilePicture) {
-        const picture = await readImageFile(profilePicture.ig_profile_picture[0].uri);
-        extractedData.profilePicture = picture;
-    }
-
-    loadTask.set('Loading ecology analytics...');
-
-    const mediaRegex = /^media\/[a-z]+\/[0-9]+\/([a-z0-9_.]+)$/;
-    const medias = files.filter((f) => mediaRegex.test(f.name)).map((f) => f.name);
-    let totalMediaSize = 0;
-    await Promise.all(
-        medias.map((media) => {
-            return new Promise((resolve) => {
-                readBlobFile(media).then((file) => {
-                    totalMediaSize += file.size;
-                    resolve();
-                });
-            });
-        })
+  const profilePicture = JSON.parse(
+    await readFile("your_instagram_activity/content/profile_photos.json")
+  );
+  if (profilePicture) {
+    const picture = await readImageFile(
+      profilePicture.ig_profile_picture[0].uri
     );
-    extractedData.totalMediaSize = formatBytes(totalMediaSize);
+    extractedData.profilePicture = picture;
+  }
 
-    loadTask.set('Loading stories...');
+  loadTask.set("Loading ecology analytics...");
 
-    const stories = JSON.parse(await readFile('content/stories.json'));
-    if (stories) {
-        extractedData.totalStoryCountSent = stories.ig_stories.length;
-    }
+  const mediaRegex = /^media\/[a-z]+\/[0-9]+\/([a-z0-9_.]+)$/;
+  const medias = files
+    .filter((f) => mediaRegex.test(f.name))
+    .map((f) => f.name);
+  let totalMediaSize = 0;
+  await Promise.all(
+    medias.map((media) => {
+      return new Promise((resolve) => {
+        readBlobFile(media).then((file) => {
+          totalMediaSize += file.size;
+          resolve();
+        });
+      });
+    })
+  );
+  extractedData.totalMediaSize = formatBytes(totalMediaSize);
 
-    loadTask.set('Loading charts...');
+  loadTask.set("Loading stories...");
 
-    const allMessages = chatsData.map((c) => c.messages).flat();
+  const stories = JSON.parse(await readFile("content/stories.json"));
+  if (stories) {
+    extractedData.totalStoryCountSent = stories.ig_stories.length;
+  }
 
-    for (let i = 0; i < 24; i++) {
-        extractedData.hoursValues.push(allMessages.filter((m) => new Date(m.timestamp).getHours() === i).length);
-    }
+  loadTask.set("Loading charts...");
 
-    const monthsLabels = [];
-    const monthsValues = [];
-    const formatMonthDate = (date) => `${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-    for (let i = new Date(firstMessage); i.getTime() <= Date.now(); i.setMonth(i.getMonth() + 1)) {
-        monthsLabels.push(formatMonthDate(i));
-        monthsValues.push(allMessages.filter((m) => formatMonthDate(new Date(m.timestamp)) === formatMonthDate(i)).length);
-    }
+  const allMessages = chatsData.map((c) => c.messages).flat();
 
-    extractedData.messagesMonths = {
-        monthsLabels,
-        monthsValues
-    };
+  for (let i = 0; i < 24; i++) {
+    extractedData.hoursValues.push(
+      allMessages.filter((m) => new Date(m.timestamp).getHours() === i).length
+    );
+  }
 
-    const topGroups = chatsData.sort((a, b) => b.messageCount - a.messageCount).slice(0, 10);
-    extractedData.topGroups = topGroups.map((group) => ({
-        name: group.name,
-        messageCount: group.messageCount
-    }));
+  const monthsLabels = [];
+  const monthsValues = [];
+  const formatMonthDate = (date) =>
+    `${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear()}`;
+  for (
+    let i = new Date(firstMessage);
+    i.getTime() <= Date.now();
+    i.setMonth(i.getMonth() + 1)
+  ) {
+    monthsLabels.push(formatMonthDate(i));
+    monthsValues.push(
+      allMessages.filter(
+        (m) => formatMonthDate(new Date(m.timestamp)) === formatMonthDate(i)
+      ).length
+    );
+  }
 
-    const topActiveGroups = chatsData.sort((a, b) => b.sentMessageCount - a.sentMessageCount).slice(0, 10);
-    extractedData.topActiveGroups = topActiveGroups.map((group) => ({
-        name: group.name,
-        sentMessageCount: group.sentMessageCount
-    }));
-    
-    const allFollowers = JSON.parse(await readFile('followers_and_following/followers.json')) ? JSON.parse(await readFile('followers_and_following/followers.json')).relationships_followers.map((f) => f.string_list_data[0]) : JSON.parse(await readFile('followers_and_following/followers_1.json')).map((f) => f.string_list_data[0]);
-    const firstFollowerTimestamp = allFollowers.sort((a, b) => a.timestamp - b.timestamp)[0].timestamp;
-    const formatDayDate = (date) => `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-    let followerCount = 0;
-    extractedData.followersValues = [];
-    for (let i = new Date(firstFollowerTimestamp * 1000); i.getTime() <= Date.now(); i.setDate(i.getDate() + 1)) {
-        const followerDayCount = allFollowers.filter((m) => formatDayDate(new Date(m.timestamp * 1000)) === formatDayDate(i)).length;
-        extractedData.followersLabels.push(formatDayDate(i));
-        followerCount += followerDayCount;
-        extractedData.followersValues.push(followerCount);
-    }
+  extractedData.messagesMonths = {
+    monthsLabels,
+    monthsValues,
+  };
 
-    return extractedData;
+  const topGroups = chatsData
+    .sort((a, b) => b.messageCount - a.messageCount)
+    .slice(0, 10);
+  extractedData.topGroups = topGroups.map((group) => ({
+    name: group.name,
+    messageCount: group.messageCount,
+  }));
 
-};
+  const topActiveGroups = chatsData
+    .sort((a, b) => b.sentMessageCount - a.sentMessageCount)
+    .slice(0, 10);
+  extractedData.topActiveGroups = topActiveGroups.map((group) => ({
+    name: group.name,
+    sentMessageCount: group.sentMessageCount,
+  }));
+
+  const allFollowers = JSON.parse(
+    await readFile("followers_and_following/followers.json")
+  )
+    ? JSON.parse(
+        await readFile("followers_and_following/followers.json")
+      ).relationships_followers.map((f) => f.string_list_data[0])
+    : JSON.parse(
+        await readFile("connections/followers_and_following/followers_1.json")
+      ).map((f) => f.string_list_data[0]);
+  const firstFollowerTimestamp = allFollowers.sort(
+    (a, b) => a.timestamp - b.timestamp
+  )[0].timestamp;
+  const formatDayDate = (date) =>
+    `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear()}`;
+  let followerCount = 0;
+  extractedData.followersValues = [];
+  for (
+    let i = new Date(firstFollowerTimestamp * 1000);
+    i.getTime() <= Date.now();
+    i.setDate(i.getDate() + 1)
+  ) {
+    const followerDayCount = allFollowers.filter(
+      (m) => formatDayDate(new Date(m.timestamp * 1000)) === formatDayDate(i)
+    ).length;
+    extractedData.followersLabels.push(formatDayDate(i));
+    followerCount += followerDayCount;
+    extractedData.followersValues.push(followerCount);
+  }
+
+  return extractedData;
+}
