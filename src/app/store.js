@@ -1,4 +1,3 @@
-
 import { writable } from 'svelte/store';
 
 const storedData = localStorage.getItem('data') || null;
@@ -12,7 +11,7 @@ export const data = writable(null);
 export const restoreFromLocalStorage = () => {
     if (dataValue) data.set(dataValue);
     return !!dataValue;
-}
+};
 
 data.subscribe((value) => {
     if (!value) localStorage.removeItem('data');
