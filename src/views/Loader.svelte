@@ -39,7 +39,7 @@
         }
         const requiredFiles = [
             'account_information/account_information.json',
-            'personal_information/account_information.json'
+            'personal_information/personal_information/account_information.json'
         ];
         let foundRequiredFile = false;
         for (const requiredFile of requiredFiles) {
