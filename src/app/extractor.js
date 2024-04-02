@@ -317,7 +317,10 @@ export async function extractData(files) {
     extractedData.totalMessageCount = messages.length;
 
     const words = messages
-        .filter((message) => message.content)
+        .filter(
+            (message) =>
+                message.content && message.content !== 'You sent an attachment.'
+        )
         .map((message) => message.content.split(' '))
         .flat()
         .filter((w) => w.length > 5);
