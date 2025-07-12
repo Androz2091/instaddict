@@ -39,7 +39,8 @@
         }
         const requiredFiles = [
             'account_information/account_information.json',
-            'personal_information/personal_information/account_information.json'
+            'personal_information/personal_information/account_information.json',
+            'personal_information/personal_information/personal_information.json'
         ];
         let foundRequiredFile = false;
         for (const requiredFile of requiredFiles) {
@@ -49,6 +50,7 @@
           }
         }
         if (!foundRequiredFile) {
+          error = 'Required files not found. Likely that Instagram changed their data format.'
           return false;
         }
         if (!validPackage) {
