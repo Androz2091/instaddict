@@ -25,62 +25,226 @@
 
 <style>
     .text-muted {
-        color: #6c757d;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 400;
     }
+    
     .text-muted.channel {
         white-space: nowrap;
+        font-size: 0.85em;
     }
+    
     .top-item {
         display: flex;
         flex-direction: row;
-        border-bottom: 1px solid white;
         align-items: center;
         justify-content: space-between;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
+    
+    .top-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #E1306C, #F56040);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+    
+    .top-item:hover {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 8px 25px rgba(225, 48, 108, 0.15);
+        border-color: rgba(225, 48, 108, 0.2);
+    }
+    
+    .top-item:hover::before {
+        opacity: 0.05;
+    }
+    
+    .top-item:last-child {
+        margin-bottom: 0;
+    }
+    
     .top-whois {
-        padding: 8px;
         align-items: center;
         display: flex;
         min-width: 0;
-        width: 100%;
+        flex: 1;
+        gap: 1rem;
     }
-    .top-item:last-child {
-        border-bottom: 0;
-    }
+    
     .top-avatar {
         border-radius: 50%;
-        height: 50px;
-        margin-right: 10px;
+        height: 48px;
+        width: 48px;
         flex-shrink: 0;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        object-fit: cover;
     }
+    
+    .top-item:hover .top-avatar {
+        border-color: rgba(225, 48, 108, 0.3);
+        transform: scale(1.05);
+    }
+    
     .top-name {
-        margin-left: inherit;
         display: flex;
         flex-direction: column;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        min-width: 0;
+        flex: 1;
+        font-size: 1rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        line-height: 1.3;
     }
+    
+    .top-name small {
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+    }
+    
     .top-messages {
         flex-shrink: 0;
+        text-align: right;
     }
+    
+    .top-messages h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        line-height: 1.2;
+    }
+    
+    .top-messages small {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
     .top-bubble {
         align-items: center;
         justify-content: center;
         display: flex;
-        flex: 0 0 35px;
-        height: 35px;
-        background-color: #50555a;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        margin-right: 10px;
+        flex-shrink: 0;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .top-bubble::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .top-item:hover .top-bubble::before {
+        opacity: 1;
+    }
+    
+    .top-bubble {
+        background: linear-gradient(135deg, #6B7280, #4B5563);
+    }
+    
     .top-bubble.first {
-        background-color: #da9e3b;
+        background: linear-gradient(135deg, #F59E0B, #D97706);
+        box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
     }
+    
     .top-bubble.second {
-        background-color: #989898;
+        background: linear-gradient(135deg, #9CA3AF, #6B7280);
+        box-shadow: 0 4px 20px rgba(156, 163, 175, 0.3);
     }
+    
     .top-bubble.third {
-        background-color: #ae7441;
+        background: linear-gradient(135deg, #92400E, #78350F);
+        box-shadow: 0 4px 20px rgba(146, 64, 14, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .top-item {
+            padding: 0.875rem 1rem;
+        }
+        
+        .top-avatar {
+            height: 42px;
+            width: 42px;
+        }
+        
+        .top-bubble {
+            width: 36px;
+            height: 36px;
+            font-size: 0.8rem;
+        }
+        
+        .top-name {
+            font-size: 0.9rem;
+        }
+        
+        .top-messages h3 {
+            font-size: 1rem;
+        }
+        
+        .top-whois {
+            gap: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .top-item {
+            padding: 0.75rem;
+        }
+        
+        .top-avatar {
+            height: 38px;
+            width: 38px;
+        }
+        
+        .top-bubble {
+            width: 32px;
+            height: 32px;
+            font-size: 0.75rem;
+        }
+        
+        .top-name {
+            font-size: 0.85rem;
+        }
+        
+        .top-messages h3 {
+            font-size: 0.9rem;
+        }
+        
+        .top-whois {
+            gap: 0.5rem;
+        }
     }
 </style>

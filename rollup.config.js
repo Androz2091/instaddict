@@ -33,10 +33,11 @@ function serve() {
 export default {
     input: 'src/main.js',
     output: {
-        sourcemap: true,
+        sourcemap: !production,
         format: 'iife',
         name: 'app',
-        file: 'public/build/bundle.js'
+        file: 'public/build/bundle.js',
+        compact: production
     },
     plugins: [
         svelte({
@@ -48,7 +49,10 @@ export default {
         }),
         // we'll extract any component CSS out into
         // a separate file - better for performance
-        css({ output: 'bundle.css' }),
+        css({ 
+            output: 'bundle.css',
+            minify: production
+        }),
 
         // If you have external dependencies installed from
         // npm, you'll most likely need these plugins. In
@@ -56,9 +60,13 @@ export default {
         // https://github.com/rollup/plugins/tree/master/packages/commonjs
         resolve({
             browser: true,
-            dedupe: ['svelte']
+            dedupe: ['svelte'],
+            preferBuiltins: false,
+            exportConditions: ['svelte']
         }),
-        commonjs(),
+        commonjs({
+            ignoreGlobal: true
+        }),
         json(),
 
         // In dev mode, call `npm run start` once
@@ -71,7 +79,21 @@ export default {
 
         // If we're building for production (npm run build
         // instead of npm run dev), minify
-        production && terser()
+        production && terser({
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+                pure_funcs: ['console.log', 'console.warn'],
+                passes: 2
+            },
+            mangle: {
+                reserved: ['extractData'],
+                toplevel: true
+            },
+            format: {
+                comments: false
+            }
+        })
     ],
     watch: {
         clearScreen: false
