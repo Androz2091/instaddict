@@ -3,13 +3,6 @@ import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-
 
 const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
-const demoUserObject = {
-    id: 422820341791064085,
-    username: 'Wumpus',
-    discriminator: '0000',
-    avatar: null
-};
-
 const getDaysRange = (start, end) => {
     for(var arr = [], date = new Date(start); date <= end; date.setDate(date.getDate()+1)){
         arr.push(new Date(date));
@@ -41,6 +34,10 @@ export default () => {
         totalVoiceMessagesMinutesReceived: randomNumber(2, 10),
 
         totalPollAnsweredCount: randomNumber(3, 10),
+        totalQuizAnsweredCount: randomNumber(5, 15),
+        totalLikedPostsCount: randomNumber(500, 2000),
+        totalCommentsCount: randomNumber(50, 200),
+
         totalPasswordChangeCount: randomNumber(1, 2),
         totalLoginCount: randomNumber(3, 10),
         totalLogoutCount: randomNumber(3, 10),
